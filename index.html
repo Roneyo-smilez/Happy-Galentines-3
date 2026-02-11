@@ -1,1 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Galentine Cinematic 💖</title>
 
+<style>
+body {
+    margin: 0;
+    height: 100vh;
+    background: linear-gradient(135deg, #ff758c, #ff7eb3, #ffc3a0);
+    background-size: 300% 300%;
+    animation: gradientMove 10s ease infinite;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    text-align: center;
+    cursor: none;
+}
+
+@keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Glitter Cursor */
+.cursor {
+    position: fixed;
+    width: 15px;
+    height: 15px;
+    background: radial-gradient(circle, #fff, #ff2e74);
+    border-radius: 50%;
+    pointer-events: none;
+    box-shadow: 0 0 15px #ff2e74, 0 0 30px #ff8fab;
+    z-index: 9999;
+}
+
+/* Sparkle Trail */
+.sparkle {
+    position: fixed;
+    width: 8px;
+    height: 8px;
+    background: white;
+    border-radius: 50%;
+    animation: sparkleFade 1s linear forwards;
+    pointer-events: none;
+}
+
+@keyframes sparkleFade {
+    to { transform: scale(0); opacity: 0; }
+}
+
+/* Floating Hearts */
+.heart {
+    position: fixed;
+    color: #ff2e74;
+    font-size: 22px;
+    animation: floatUp 6s linear forwards;
+    pointer-events: none;
+}
+
+@keyframes floatUp {
+    0% { transform: translateY(100vh); opacity: 1; }
+    100% { transform: translateY(-10vh); opacity: 0; }
+}
+
+.card {
+    background: white;
+    padding: 40px;
+    border-radius: 30px;
+    box-shadow: 0 30px 70px rgba(0,0,0,0.4);
+    max-width: 500px;
+    position: relative;
+    z-index: 10;
+    transition: opacity 2s ease, transform 2s ease;
+}
+
+.fadeOut {
+    opacity: 0;
+    transform: scale(0.8);
+}
+
+h1 {
+    color: #ff2e74;
+    font-size: 32px;
+}
+
+.name {
+    font-size: 28px;
+    color: #ff2e74;
+    opacity: 0;
+    animation: fadeName 1.5s forwards;
+}
+
+@keyframes fadeName {
+    to { opacity: 1; transform: scale(1.1); }
+}
+
+button {
+    padding: 12px 25px;
+    margin: 10px;
+    border: none;
+    border-radius: 30px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#yesBtn {
+    background-color: #ff2e74;
+    color: white;
+    transition: transform 0.3s;
+}
+
+#yesBtn:hover {
+    transform: scale(1.1);
+}
+
+#noBtn {
+    background-color: #ffc2d1;
+    position: absolute;
+}
+
+#secondPage {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #ffdde1, #ee9ca7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    opacity: 0;
+    transition: opacity 3s ease;
+}
+
+.showPage {
+    opacity: 1 !important;
+}
+
+#secondPage img {
+    width: 70%;
+    max-width: 320px;
+    border-radius: 25px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+    margin-bottom: 20px;
+    transform: scale(0.8);
+    animation: zoomIn 3s forwards;
+}
+
+@keyframes zoomIn {
+    to { transform: scale(1); }
+}
+
+/* Mobile Drama */
+@media (max-width: 600px) {
+    h1 { font-size: 24px; }
+    .card { padding: 25px; transform: scale(1.1); }
+}
+</style>
+</head>
+
+<body>
+
+<div class="cursor" id="cursor"></div>
+
+<audio id="bgMusic" src="song.mp3"></audio>
+
+<div class="card" id="firstPage">
+    <div id="nameContainer"></div>
+    <h1 id="question" style="opacity:0;">Will you be my Galentines? 💖</h1>
+    <button id="yesBtn" style="display:none;">YESSSS 💕</button>
+    <button id="noBtn" style="display:none;">No 🙈</button>
+</div>
+
+<div id="secondPage">
+    <img src="photo.jpg" alt="Us 💖">
+    <h1>It’s a Dateeee 💕</h1>
+    <p>You are my favourite humans 🥹💖</p>
+    <p><strong>
+        📍 The Village Sanctuary Restaurant<br>
+        📅 14 February 2026<br>
+        🕛 12 PM
+    </strong></p>
+    <h2 id="countdown"></h2>
+</div>
+
+<script>
+const names = ["Puleng 💕", "Potlako 💕", "Roneyo 💕"];
+const nameContainer = document.getElementById("nameContainer");
+const question = document.getElementById("question");
+const yesBtn = document.getElementById("yesBtn");
+const noBtn = document.getElementById("noBtn");
+const firstPage = document.getElementById("firstPage");
+const secondPage = document.getElementById("secondPage");
+const music = document.getElementById("bgMusic");
+
+/* Name Reveal */
+let i = 0;
+function showNames() {
+    if (i < names.length) {
+        const name = document.createElement("div");
+        name.classList.add("name");
+        name.innerText = names[i];
+        nameContainer.appendChild(name);
+        i++;
+        setTimeout(showNames, 1500);
+    } else {
+        question.style.opacity = 1;
+        yesBtn.style.display = "inline-block";
+        noBtn.style.display = "inline-block";
+    }
+}
+showNames();
+
+/* Glitter Cursor */
+const cursor = document.getElementById("cursor");
+document.addEventListener("mousemove", e => {
+    cursor.style.left = e.clientX + "px";
+    cursor.style.top = e.clientY + "px";
+
+    const sparkle = document.createElement("div");
+    sparkle.classList.add("sparkle");
+    sparkle.style.left = e.clientX + "px";
+    sparkle.style.top = e.clientY + "px";
+    document.body.appendChild(sparkle);
+    setTimeout(() => sparkle.remove(), 1000);
+});
+
+/* Floating Hearts */
+setInterval(() => {
+    const heart = document.createElement("div");
+    heart.classList.add("heart");
+    heart.innerHTML = "💖";
+    heart.style.left = Math.random() * window.innerWidth + "px";
+    document.body.appendChild(heart);
+    setTimeout(() => heart.remove(), 6000);
+}, 700);
+
+/* NO button runs */
+noBtn.addEventListener("mouseover", () => {
+    noBtn.style.left = Math.random() * (window.innerWidth - 100) + "px";
+    noBtn.style.top = Math.random() * (window.innerHeight - 50) + "px";
+});
+
+/* YES click cinematic */
+yesBtn.addEventListener("click", () => {
+
+    music.play();
+
+    // Confetti
+    for (let i = 0; i < 80; i++) {
+        const confetti = document.createElement("div");
+        confetti.style.position = "fixed";
+        confetti.style.width = "8px";
+        confetti.style.height = "8px";
+        confetti.style.background = `hsl(${Math.random()*360},100%,70%)`;
+        confetti.style.left = window.innerWidth/2 + "px";
+        confetti.style.top = window.innerHeight/2 + "px";
+        confetti.style.transition = "all 1s ease-out";
+        document.body.appendChild(confetti);
+
+        setTimeout(() => {
+            confetti.style.left = Math.random()*window.innerWidth + "px";
+            confetti.style.top = Math.random()*window.innerHeight + "px";
+            confetti.style.opacity = "0";
+        }, 10);
+
+        setTimeout(() => confetti.remove(), 1000);
+    }
+
+    firstPage.classList.add("fadeOut");
+
+    setTimeout(() => {
+        firstPage.style.display = "none";
+        secondPage.classList.add("showPage");
+    }, 2000);
+});
+
+/* Countdown */
+const countdown = document.getElementById("countdown");
+const eventDate = new Date("February 14, 2026 12:00:00").getTime();
+
+setInterval(() => {
+    const now = new Date().getTime();
+    const distance = eventDate - now;
+
+    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+
+    countdown.innerHTML = `⏳ ${days} days ${hours} hrs to go 💕`;
+}, 1000);
+</script>
+
+</body>
+</html>
