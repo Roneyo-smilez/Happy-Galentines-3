@@ -15,16 +15,17 @@ body {
     overflow:hidden;
     font-family:'Playfair Display', serif;
     text-align:center;
+    cursor:none;
 }
 
-/* Netflix bars */
+/* Netflix Bars */
 .bar {
     position:fixed;
     width:100%;
-    height:80px;
+    height:100px;
     background:black;
-    z-index:10;
-    animation: bars 2s forwards;
+    z-index:20;
+    animation: bars 3s forwards ease;
 }
 .top { top:0; }
 .bottom { bottom:0; }
@@ -33,7 +34,7 @@ body {
     to { height:0; }
 }
 
-/* Page containers */
+/* Page setup */
 .page {
     position:absolute;
     width:100%;
@@ -54,13 +55,14 @@ body {
 
 /* Shimmer */
 .shimmer {
-    font-size:2.5rem;
+    font-size:2.7rem;
     background:linear-gradient(90deg,#fff,#ff4da6,#fff);
     background-size:200%;
     -webkit-background-clip:text;
     color:transparent;
-    animation: shimmer 5s infinite;
+    animation: shimmer 6s infinite linear;
 }
+
 @keyframes shimmer {
     0%{background-position:-200%}
     100%{background-position:200%}
@@ -74,20 +76,24 @@ button {
     border:none;
     border-radius:25px;
     cursor:pointer;
+    transition:0.3s;
 }
 .yes { background:#ff4da6;color:white; }
 .no { background:white;color:black; }
 
-/* Love letter scroll */
+button:hover { transform:scale(1.1); }
+
+/* Letter */
 #letter {
     width:80%;
     max-width:500px;
     font-size:1.1rem;
     line-height:1.8;
     margin-top:20px;
+    min-height:150px;
 }
 
-/* Countdown glow */
+/* Countdown */
 #countdown {
     margin-top:15px;
     font-size:1.3rem;
@@ -98,27 +104,46 @@ button {
     to { text-shadow:0 0 20px hotpink; }
 }
 
-/* Zoom image */
+/* Photo reveal */
 #photo {
-    width:250px;
+    width:260px;
     border-radius:20px;
     margin-top:20px;
-    animation: zoom 15s infinite alternate ease-in-out;
+    opacity:0;
+    transform:scale(0.8);
+    transition:2s ease;
 }
-@keyframes zoom {
-    from { transform:scale(1); }
-    to { transform:scale(1.1); }
+
+.showPhoto {
+    opacity:1 !important;
+    transform:scale(1) !important;
 }
 
 /* Petals */
 .petal {
     position:fixed;
-    top:-10px;
+    top:-20px;
     font-size:20px;
     animation: fall linear forwards;
 }
 @keyframes fall {
-    to { transform:translateY(110vh); }
+    to { transform:translateY(110vh) rotate(360deg); }
+}
+
+/* Glitter trail */
+.sparkle {
+    position:fixed;
+    pointer-events:none;
+    font-size:12px;
+    animation: fade 1s forwards;
+}
+@keyframes fade {
+    to { opacity:0; transform:translateY(10px); }
+}
+
+canvas {
+    position:fixed;
+    pointer-events:none;
 }
 </style>
 </head>
@@ -137,14 +162,10 @@ button {
 </div>
 
 <div id="page2" class="page hidden">
-    <h1 class="shimmer">Karabo & My Forever Galentine</h1>
-
+    <h1 class="shimmer">Roneyo & Puleng</h1>
     <div id="letter"></div>
-
     <div id="countdown"></div>
-
     <img id="photo" src="photo.jpg">
-
     <p style="margin-top:20px;">
         Lunch Date: 14 Feb<br>
         Time: 13:00<br>
@@ -155,16 +176,30 @@ button {
 <script>
 let music = document.getElementById("music");
 
+/* Soft music fade */
 window.onload = () => {
     music.volume = 0;
     music.play().catch(()=>{});
     let fade = setInterval(()=>{
         if(music.volume < 1){
-            music.volume += 0.05;
+            music.volume += 0.02;
         } else clearInterval(fade);
-    },250);
-    createPetals(15);
+    },200);
+    startPetals();
 };
+
+/* Continuous petals */
+function startPetals(){
+    setInterval(()=>{
+        let petal=document.createElement("div");
+        petal.innerHTML="🌹";
+        petal.classList.add("petal");
+        petal.style.left=Math.random()*100+"vw";
+        petal.style.animationDuration=(6+Math.random()*4)+"s";
+        document.body.appendChild(petal);
+        setTimeout(()=>petal.remove(),10000);
+    },500);
+}
 
 /* Move NO button */
 function moveNo(btn){
@@ -177,65 +212,44 @@ function moveNo(btn){
 function accept(){
     document.getElementById("page1").classList.add("hidden");
     document.getElementById("page2").classList.remove("hidden");
-
-    createPetals(40);
-    startLetter();
+    typeLetter();
     startCountdown();
+    setTimeout(()=>document.getElementById("photo").classList.add("showPhoto"),4000);
 }
 
-/* Typewriter line by line */
-let lines = [
-"From the very first laugh,",
-"I knew you were special.",
-"You are warmth, joy, and magic.",
-"This lunch is just an excuse",
-"to celebrate how amazing you are.",
-"So… be mine this Galentine’s? 💖"
-];
-
-function startLetter(){
-    let container = document.getElementById("letter");
-    let i = 0;
-
-    function showLine(){
-        if(i < lines.length){
-            let p = document.createElement("div");
-            p.innerText = lines[i];
-            p.style.opacity = 0;
-            container.appendChild(p);
-            setTimeout(()=>{ p.style.transition="opacity 2s"; p.style.opacity=1; },100);
-            i++;
-            setTimeout(showLine,2000);
-        }
+/* Typewriter letter */
+let text = "From the very first laugh, I knew you were special. You are warmth, joy, and magic. This lunch is just an excuse to celebrate how amazing you are. So… be mine this Galentine’s? 💖";
+let i=0;
+function typeLetter(){
+    if(i < text.length){
+        document.getElementById("letter").innerHTML += text.charAt(i);
+        i++;
+        setTimeout(typeLetter,40);
     }
-    showLine();
 }
 
 /* Countdown */
 function startCountdown(){
     let target = new Date("Feb 14, 2026 13:00:00").getTime();
-    let x = setInterval(()=>{
+    setInterval(()=>{
         let now = new Date().getTime();
         let diff = target-now;
-        if(diff<0){clearInterval(x);return;}
         let days = Math.floor(diff/(1000*60*60*24));
         document.getElementById("countdown").innerText =
         days+" days until our date 💕";
     },1000);
 }
 
-/* Petals */
-function createPetals(amount){
-    for(let i=0;i<amount;i++){
-        let petal=document.createElement("div");
-        petal.innerHTML="🌹";
-        petal.classList.add("petal");
-        petal.style.left=Math.random()*100+"vw";
-        petal.style.animationDuration=(5+Math.random()*5)+"s";
-        document.body.appendChild(petal);
-        setTimeout(()=>petal.remove(),10000);
-    }
-}
+/* Glitter mouse */
+document.addEventListener("mousemove",function(e){
+    let spark=document.createElement("div");
+    spark.className="sparkle";
+    spark.innerHTML="✨";
+    spark.style.left=e.pageX+"px";
+    spark.style.top=e.pageY+"px";
+    document.body.appendChild(spark);
+    setTimeout(()=>spark.remove(),1000);
+});
 </script>
 
 </body>
